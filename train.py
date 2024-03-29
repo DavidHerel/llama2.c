@@ -31,47 +31,52 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from tinystories import Task
 from tinynyt import NYTTask
 from export import model_export
-
+import argparse
 # -----------------------------------------------------------------------------
 # I/O
-out_dir = "out"
-eval_interval = 2000
-log_interval = 1
+parser = argparse.ArgumentParser()
+parser.add_argument("dir_", type=str)
+args = parser.parse_args()
+month_dir=args.dir_.zfill(2)
+out_dir = "110m_"+month_dir+"_out"
+eval_interval = 1000
+log_interval = 100
 eval_iters = 100
 eval_only = False  # if True, script exits right after the first eval
-always_save_checkpoint = False  # if True, always save a checkpoint after each eval
+always_save_checkpoint = True  # if True, always save a checkpoint after each eval
 init_from = "scratch"  # 'scratch' or 'resume'
 # wandb logging
 wandb_log = True  # disabled by default
 wandb_project = "llamac"
 wandb_entity = "hereldav"
-wandb_run_name = "run" + datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+wandb_run_name = out_dir + datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
 # data
-batch_size = 128  # if gradient_accumulation_steps > 1, this is the micro-batch size
-max_seq_len = 256
-dataset="nyt"
+batch_size = 16  # if gradient_accumulation_steps > 1, this is the micro-batch size
+max_seq_len = 1024
+dataset="tinystories"
 vocab_source = "llama2" # llama2|custom; use Lllama 2 vocab from Meta, or custom trained
 vocab_size = 32000 # the Llama 2 tokenizer has 32K tokens
 # model
-dim = 288
-n_layers = 6
-n_heads = 6
-n_kv_heads = 6
+dim = 768
+n_layers = 12
+n_heads = 12
+n_kv_heads = 12
 multiple_of = 32
-dropout = 0.0
+dropout = 0
 # adamw optimizer
-gradient_accumulation_steps = 4  # used to simulate larger batch sizes
-learning_rate = 5e-4  # max learning rate
-max_iters = 100000  # total number of training iterations
+gradient_accumulation_steps = 8  # used to simulate larger batch sizes
+learning_rate = 3e-4  # max learning rate
+#1024*16*8= per iteration 131,000
+max_iters = 50000  # total number of training iterations
 weight_decay = 1e-1
 beta1 = 0.9
 beta2 = 0.95
 grad_clip = 1.0  # clip gradients at this value, or disable if == 0.0
 # learning rate decay settings
 decay_lr = True  # whether to decay the learning rate
-warmup_iters = 1000  # how many steps to warm up for
+warmup_iters = 2000  # how many steps to warm up for
 # system
-device = "cpu"  # examples: 'cpu', 'cuda', 'cuda:0', 'cuda:1' etc., or try 'mps' on macbooks
+device = "cuda"  # examples: 'cpu', 'cuda', 'cuda:0', 'cuda:1' etc., or try 'mps' on macbooks
 dtype = "bfloat16"  # float32|bfloat16|float16
 compile = True  # use PyTorch 2.0 to compile the model to be faster
 # -----------------------------------------------------------------------------
@@ -80,7 +85,7 @@ config_keys = [
     for k, v in globals().items()
     if not k.startswith("_") and isinstance(v, (int, float, bool, str))
 ]
-exec(open("configurator.py").read())  # overrides from command line or config file
+#exec(open("configurator.py").read())  # overrides from command line or config file
 config = {k: globals()[k] for k in config_keys}  # will be useful for logging
 # -----------------------------------------------------------------------------
 
@@ -140,6 +145,7 @@ iter_batches = partial(
     vocab_size=vocab_size,
     vocab_source=vocab_source,
     device=device,
+    data_dir="data/reddit_2023_"+month_dir,
     num_workers=0,
 )
 
