@@ -143,12 +143,14 @@ def pretokenize():
 class PretokDataset(torch.utils.data.IterableDataset):
     """Loads pretokenized examples from disk and yields them as PyTorch tensors."""
 
-    def __init__(self, split, max_seq_len, vocab_size, vocab_source):
+    def __init__(self, split, max_seq_len, vocab_size, vocab_source, data_dir):
         super().__init__()
         self.split = split
         self.max_seq_len = max_seq_len
         self.vocab_size = vocab_size
         self.vocab_source = vocab_source
+        self.DATA_CACHE_DIR = data_dir
+
 
     def __iter__(self):
         # get worker info within a DataLoader
@@ -161,11 +163,11 @@ class PretokDataset(torch.utils.data.IterableDataset):
         rng = random.Random(seed)
         print(f"Created a PretokDataset with rng seed {seed}")
         # the .bin files are right along the .json files
-        bin_dir = os.path.join(DATA_CACHE_DIR, "trains_shards")
+        bin_dir = os.path.join(DATA_CACHE_DIR, "train_shards")
         shard_filenames = sorted(glob.glob(os.path.join(bin_dir, "*.bin")))
         data_file_valid = os.path.join(DATA_CACHE_DIR, "valid.bin")
         # train/test split. let's use only shard 0 for test split, rest train
-        shard_filenames = shard_filenames if self.split == "train" else data_file_valid
+        shard_filenames = shard_filenames if self.split == "train" else [data_file_valid]
         assert len(shard_filenames)>0, f"No bin files found in {bin_dir}"
         while True:
             rng.shuffle(shard_filenames)
