@@ -1,3 +1,16 @@
+## Forked changes
+### Pretokenization
+If you want to pretokenize your dataset you can do it with `tinystories.py`, where you will modify `DATA_CACHE_DIR`, which will point to a folder, where you have your `train.txt` and `valid.txt`. Train file will be splitted into shards and tokenized in parrallel, this is not happening for validation, due to its small size - it's not needed.
+```bash
+python tinystories.py pretokenize
+```
+### Training
+To train llama model you have to run `train.py`, where the first argument is month of your dataset, You also need to change a path to your dataset. I have modified it to my needs, because I need to train it on several months.
+
+```bash
+torchrun --standalone --nproc_per_node=8 train.py 12
+```
+
 ## llama2.c
 
 <p align="center">
