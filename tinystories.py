@@ -163,9 +163,9 @@ class PretokDataset(torch.utils.data.IterableDataset):
         rng = random.Random(seed)
         print(f"Created a PretokDataset with rng seed {seed}")
         # the .bin files are right along the .json files
-        bin_dir = os.path.join(DATA_CACHE_DIR, "train_shards")
+        bin_dir = os.path.join(self.DATA_CACHE_DIR, "train_shards")
         shard_filenames = sorted(glob.glob(os.path.join(bin_dir, "*.bin")))
-        data_file_valid = os.path.join(DATA_CACHE_DIR, "valid.bin")
+        data_file_valid = os.path.join(self.DATA_CACHE_DIR, "valid.bin")
         # train/test split. let's use only shard 0 for test split, rest train
         shard_filenames = shard_filenames if self.split == "train" else [data_file_valid]
         assert len(shard_filenames)>0, f"No bin files found in {bin_dir}"
