@@ -145,7 +145,7 @@ iter_batches = partial(
     vocab_size=vocab_size,
     vocab_source=vocab_source,
     device=device,
-    data_dir="data/reddit_2023_"+month_dir,
+    data_dir="data/2023-"+month_dir,
     num_workers=0,
 )
 
