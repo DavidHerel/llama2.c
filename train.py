@@ -51,7 +51,7 @@ wandb_project = "llamac"
 wandb_entity = "hereldav"
 wandb_run_name = out_dir + datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
 # data
-batch_size = 8  # if gradient_accumulation_steps > 1, this is the micro-batch size
+batch_size = 2  # if gradient_accumulation_steps > 1, this is the micro-batch size
 max_seq_len = 1024
 dataset="tinystories"
 vocab_source = "llama2" # llama2|custom; use Lllama 2 vocab from Meta, or custom trained
@@ -64,7 +64,7 @@ n_kv_heads = 4
 multiple_of = 64
 dropout = 0
 # adamw optimizer
-gradient_accumulation_steps = 16  # used to simulate larger batch sizes
+gradient_accumulation_steps = 64  # used to simulate larger batch sizes
 learning_rate = 4e-4  # max learning rate
 #1024*16*8= per iteration 131,000
 max_iters = 25000  # total number of training iterations
