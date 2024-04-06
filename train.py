@@ -38,10 +38,10 @@ parser = argparse.ArgumentParser()
 parser.add_argument("dir_", type=str)
 args = parser.parse_args()
 month_dir=args.dir_.zfill(2)
-out_dir = "110m_"+month_dir+"_out"
+out_dir = "1_3b_"+month_dir+"_out"
 eval_interval = 1000
 log_interval = 100
-eval_iters = 100
+eval_iters = 500
 eval_only = False  # if True, script exits right after the first eval
 always_save_checkpoint = True  # if True, always save a checkpoint after each eval
 init_from = "scratch"  # 'scratch' or 'resume'
@@ -57,17 +57,17 @@ dataset="tinystories"
 vocab_source = "llama2" # llama2|custom; use Lllama 2 vocab from Meta, or custom trained
 vocab_size = 32000 # the Llama 2 tokenizer has 32K tokens
 # model
-dim = 768
-n_layers = 12
-n_heads = 12
-n_kv_heads = 12
-multiple_of = 32
+dim = 2048
+n_layers = 22
+n_heads = 32
+n_kv_heads = 4
+multiple_of = 64
 dropout = 0
 # adamw optimizer
 gradient_accumulation_steps = 8  # used to simulate larger batch sizes
-learning_rate = 3e-4  # max learning rate
+learning_rate = 4e-4  # max learning rate
 #1024*16*8= per iteration 131,000
-max_iters = 50000  # total number of training iterations
+max_iters = 25000  # total number of training iterations
 weight_decay = 1e-1
 beta1 = 0.9
 beta2 = 0.95
@@ -91,7 +91,7 @@ config = {k: globals()[k] for k in config_keys}  # will be useful for logging
 
 # fixing some hyperparams to sensible defaults
 lr_decay_iters = max_iters  # should be ~= max_iters per Chinchilla
-min_lr = 0.0  # minimum learning rate, should be ~= learning_rate/10 per Chinchilla
+min_lr = 4e-5  # minimum learning rate, should be ~= learning_rate/10 per Chinchilla
 
 # validating checks
 assert vocab_source in ["llama2", "custom"]
