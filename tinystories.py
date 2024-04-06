@@ -219,7 +219,6 @@ class Task:
 # CLI for constructing the dataset
 
 if __name__ == "__main__":
-    global DATA_CACHE_DIR
     """
     These stages are designed to be run in order.
 
@@ -237,7 +236,7 @@ if __name__ == "__main__":
     parser.add_argument("--vocab_size", type=int, default=0, help="pretokenization vocab size. 0 = use Llama 2 tokenizer.")
     parser.add_argument("--dir_name", type=str, default="")
     args = parser.parse_args()
-    DATA_CACHE_DIR = args.dir_name.zfill(2)
+    DATA_CACHE_DIR = "2023-"+args.dir_name.zfill(2)
 
     # depending on the stage call the appropriate function
     if args.stage == "download":
