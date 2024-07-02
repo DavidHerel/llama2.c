@@ -80,6 +80,22 @@ def get_ppl(model, start, starts_with):
         with ctx:
             logits, loss = model(x, y)
             return loss.exp().item()
+
+def get_log_probability(model, text, starts_with, device):
+    start_ids = enc.encode(starts_with + text, bos=True, eos=False)
+    x = torch.tensor(start_ids[:-1], dtype=torch.long, device=device)[None, ...]
+    y = torch.tensor(start_ids[1:], dtype=torch.long, device=device)[None, ...]
+
+    with torch.no_grad():
+        with ctx:
+            logits, _ = model(x, y)
+    
+    # Calculate log probabilities
+    log_probs = F.log_softmax(logits, dim=-1)
+    token_log_probs = log_probs.gather(2, y.unsqueeze(-1)).squeeze(-1)
+    total_log_prob = token_log_probs.sum().item()
+    return total_log_prob
+
 def score_file_peak(filename, model):
    score_right = 0
    score_all = 0
